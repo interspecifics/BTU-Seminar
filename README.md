@@ -13,7 +13,9 @@ Each of the practical sessions is presented in a workshop format, where we will 
 - MODULE 6 Closing 
 
 
-#Installation of the modules
+**Installation of the python libraries in terminal**
+```
 pip install pandas
 pip install scikit-learn
 pip install pygame 
+```
