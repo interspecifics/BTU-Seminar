@@ -4,7 +4,7 @@
 
 python implementations of dynamic time warping DTW algorithm in wekinator
 
-Uses dtw for recognize eeg data events: 
+Uses dtw for recognize eeg data events:
 
 """
 
@@ -12,15 +12,15 @@ Uses dtw for recognize eeg data events:
 # A 1.1       press key to start capturing a number of samples
 # A 2.    find centroids of each gesture (trainning), For centrois keep sample order and calculate mean across events
 # A 2.1
-#        
-# B 3.    on listening, when new sample comes 
+#
+# B 3.    on listening, when new sample comes
 # B 3.1       add sample to buffer
 # B 3.2       calcule dtw between buffer and each centroid
 # B 3.3       get minimum of these
-# B 3.4       if above threshold 
+# B 3.4       if above threshold
 # B 3.4.1         update output state
 # B 3.4.2         send gesture recognition msg
-# B 3.5       
+# B 3.5
 
 
 # 211001 -> V0.1: capture training samples, show centroid and saves it as pickle file [data,centroid]
@@ -46,7 +46,7 @@ from glob import glob
 from pandas import *
 import statistics
 
-import numpy as np 
+import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 from dtw import accelerated_dtw, dtw
 from scipy.stats.stats import pearsonr
@@ -81,7 +81,7 @@ DATA_PATH = './data'
 FONT_PATH = './RevMiniPixel.ttf'
 FONT = pygame.font.Font(FONT_PATH, 16)
 FONTmini = pygame.font.Font(FONT_PATH, 14)
-OSC_HOST = "192.168.1.250"
+OSC_HOST = "127.0.0.1"
 OSC_PORT = 9000
 OSC_CLIENT = []
 
@@ -267,7 +267,7 @@ def send_osc():
         aux_val = float(actual_set[j])
         PLOTS[j].update(aux_val, ch)
         if (sws[j]):
-            ruta = '/potencial/{}'.format(ch.lower())    
+            ruta = '/potencial/{}'.format(ch.lower())
             ruta = ruta.encode()
             #print("{} \t{:0.3f}\t".format(ch, aux_val))
             if (modes[j]):
@@ -333,7 +333,7 @@ def load_protos(filename_protos):
 
 # functions
 def isFloat(s):
-    try: 
+    try:
         float(s)
         return True
     except ValueError:
@@ -346,7 +346,7 @@ def tic():
     update_data(ii)
     get_dtw()
     send_osc()
-    # update 
+    # update
     if (ii<len(canales[ch_names[0]])-1):
         ii = ii+1
     else:
@@ -468,7 +468,7 @@ def update_text():
     AUX_LABEL = FONT.render(' [ POTENCIAL DE ACCIÓN ]', 1, (64, 32, 128))
     WINDOW.blit(AUX_LABEL, (360, 25))
     """
-        for j in range(N_CHANNELS): 
+        for j in range(N_CHANNELS):
         if sws[j]:     LAB = FONT.render(ch_names[j], 1, (0, 255, 0))
         else:        LAB = FONT.render(ch_names[j], 1, (32, 24, 0))
         #WINDOW.blit(LABELS[j], (104+j*75, 354))
@@ -509,7 +509,7 @@ def main():
     pygame.time.set_timer(TIC_EVENT, TIC_TIMER)
     game_loop()
     print("FIN DE LA TRANSMISSION //...")
-    
+
 if __name__=="__main__":
     main()
 
@@ -521,4 +521,3 @@ if __name__=="__main__":
 
 
 # -------------------------------------------------------------------------------
-
