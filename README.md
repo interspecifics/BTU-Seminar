@@ -1,10 +1,6 @@
-# BTU - SEMINAR
+# BEYOND SONIFICATION: A DATA-DRIVEN MACHINE LEARNING COMPOSITION APPROACH 
 Edgar Varése - Guest Professorship. 
-
-
-
-BEYOND SONIFICATION: A DATA-DRIVEN MACHINE LEARNING COMPOSITION APPROACH
-
+BTU - SEMINAR
 
 We will explore a contemporary technique for generative sound, which involves incoming data and machine learning as a form of sound influence. We will use a set of open-source pattern-recognition applications developed by our collective to cluster and map data streams as sound event triggers and modulators in a synthesis generator of choice.
 Each of the practical sessions is presented in a workshop format, where we will share the technology and developments of some of our most representative projects.
