@@ -18,4 +18,5 @@ Each of the practical sessions is presented in a workshop format, where we will 
 pip install pandas
 pip install scikit-learn
 pip install pygame 
+python -m pip install dtw
 ```
