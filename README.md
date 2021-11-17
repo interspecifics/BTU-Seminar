@@ -12,3 +12,8 @@ Each of the practical sessions is presented in a workshop format, where we will 
 - MODULE 5 AI Collaborative processes 
 - MODULE 6 Closing 
 
+
+#Installation of the modules
+pip install pandas
+pip install scikit-learn
+pip install pygame 
