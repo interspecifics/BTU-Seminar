@@ -1,43 +1,36 @@
 """
-300921.EEE
-----------
+// i n t e r s p e c i f i c s  @  T U B, Autumn 2021
+Module 2: Brain Bioelectricity
 
-python implementations of dynamic time warping DTW algorithm in wekinator
-
-Uses dtw for recognize eeg data events:
+Potencial de Acción
+Python implementations of dynamic time warping DTW algorithm for recognizing eeg events in streamed data.
 
 """
 
-# A 1.    capture data
-# A 1.1       press key to start capturing a number of samples
-# A 2.    find centroids of each gesture (trainning), For centrois keep sample order and calculate mean across events
-# A 2.1
-#
-# B 3.    on listening, when new sample comes
-# B 3.1       add sample to buffer
-# B 3.2       calcule dtw between buffer and each centroid
-# B 3.3       get minimum of these
-# B 3.4       if above threshold
-# B 3.4.1         update output state
-# B 3.4.2         send gesture recognition msg
-# B 3.5
+#0. install dependencies:
+#   $ pip install pygame
+#   $ pip install numpy
+#   $ pip install scipy
+#   $ pip install sklearn
+#   $ pip install pandas
+#   $ pip install dtw
+#   $ pip install oscpy
+
+#   -   -   -   -   -   -   -   -
+#1. load csv file in main()   
+#   -> load_data_csv("./data/EEGdata_02_ReducFilterIC/valery_RF_ELEC.csv")
+#2. show electrodes channels
+#   -> plots (AF3, AF7, F4, F3, F7, F8)
+#3. show dtw distance between training patterns and current streamed data 
+#   -> plots (A, B, C, D )
+#3. send electrode and dtw signals as OSC, 
+#   ->switch on/off, 
+#   ->change mode raw/normalized 
+#   ->thresholds for dtw channels
+#   -   -   -   -   -   -   -   -   
 
 
-# 211001 -> V0.1: capture training samples, show centroid and saves it as pickle file [data,centroid]
-# 211002 -> V0.2: real time dtw
-
-
-#211116 -> EEG, load csv files and w
-
-
-
-#1. pass the file to read as arg
-#2. show channels as plotlines
-#3. calculate rt for dtw
-
-
-
-# a pygame app
+# ... .... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ...
 import pygame
 import pickle, datetime
 from oscpy.client import OSCClient
@@ -45,14 +38,14 @@ from time import sleep
 from glob import glob
 from pandas import *
 import statistics
-
-import numpy as np
+import numpy as np 
 from sklearn.metrics.pairwise import euclidean_distances
 from dtw import accelerated_dtw, dtw
 from scipy.stats.stats import pearsonr
 
 dist_fun = euclidean_distances
 
+# colors definition
 COLOR_RED =   0xFF00FF
 COLOR_GREEN = (255, 255, 0)
 COLOR_BLUE =  (0, 255, 255)
@@ -72,7 +65,7 @@ COLORS_PATS = [
     0x012a4a
 ]
 
-# init
+# initialize and load font
 pygame.init()
 W = 720
 H = 900
@@ -81,14 +74,20 @@ DATA_PATH = './data'
 FONT_PATH = './RevMiniPixel.ttf'
 FONT = pygame.font.Font(FONT_PATH, 16)
 FONTmini = pygame.font.Font(FONT_PATH, 14)
-OSC_HOST = "127.0.0.1"
+
+#   -   -   -   -   -   -   -   change OSC PORT and HOST IP -   -   -   -    -   -  -   -#
+OSC_HOST = "192.168.1.250"
 OSC_PORT = 9000
 OSC_CLIENT = []
 
-######## #######
+
 # ... .... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ...
-# processing map function
 def pmap(value, inMin, inMax, outMin, outMax):
+    """
+        Like processing's map function-
+        Receives value in range(inMin,inMax)
+        Returns a new val in range (outMin, outMax)
+    """
     inSpan = inMax - inMin
     outSpan = outMax - outMin
     try:
@@ -98,6 +97,16 @@ def pmap(value, inMin, inMax, outMin, outMax):
         return 0
 
 class Plot():
+    """
+        Plots are data management and display objects
+        Receives position, size, name and color as arguments when creating new objects 
+            P = Plot(x, y, w, h, nam, colo) 
+        Add new_value to plot 
+            P.update(new_value, ch)
+        Draw over PLOTS_SCREEN surface in coordinates px,py
+            P.draw_h(PLOTS_SCREEN, px, py)
+        
+    """
     def __init__(self, x, y, w, h, nam, colo):
         # create and update pixel-style plots
         self.pos = []       #position
@@ -171,23 +180,22 @@ class Plot():
         #surf.blit(n_estacion, (dx, dy-20+320))
         return
 
-# ... .... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ...
-######## #######
 
+# ... .... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ...
 WINDOW = pygame.display.set_mode((W, H))
 
-# main screen for drawing buttons
+# create surfaces for plots and background
 BG_SCREEN = pygame.Surface((W,H))
 BG_SCREEN.fill((255,255,255))
 PLOTS_SCREEN = pygame.Surface((W,H))
 
-# buttons for electrodes
+# create buttons for electrodes
 N_CHANNELS = 6
 CHANNELS = ["AF3", "AF7", "F3", "F4", "F7", "F8"]
 LABELS = [FONT.render(cs, 1, (0, 255, 0)) for cs in CHANNELS]
 CH_SWITCHES = [pygame.draw.rect(PLOTS_SCREEN, COLOR_GREEN, pygame.Rect(250+320, 50+c*75, 30, 70), 1) for c in range(N_CHANNELS)]
 CH_MODES    = [pygame.draw.rect(PLOTS_SCREEN, COLOR_RED, pygame.Rect(285+320,50+c*75, 30, 70), 1) for c in range(N_CHANNELS)]
-# buttons for pattern match
+# create buttons for patterns
 N_PATTERNS = 4
 PATTERNS = ["A", "B", "C", "D"]
 LABELS = [FONT.render(ps, 1, (0, 255, 0)) for ps in PATTERNS]
@@ -195,23 +203,19 @@ PM_SWITCHES    = [pygame.draw.rect(PLOTS_SCREEN, COLOR_RED, pygame.Rect(285+320,
 PM_MODES    = [pygame.draw.rect(PLOTS_SCREEN, COLOR_RED, pygame.Rect(250+320, 550+c*75, 30, 30), 1) for c in range(N_PATTERNS)]
 PM_THRESH = [pygame.draw.rect(PLOTS_SCREEN, COLOR_GREEN, pygame.Rect(285+320, 550+c*75, 30, 30), 1) for c in range(N_PATTERNS)]
 
-
 # timer events
 TIC_EVENT = pygame.USEREVENT + 1
 TIC_TIMER = 30
-
-#states and counters
 clock = pygame.time.Clock()
 running = True
 
+# initialize values for interface
 sws = [True for c in range(N_CHANNELS)]
 modes = [1  for c in range(N_CHANNELS)] # mode 0 is normalized, 1 is raw
-
 p_sws = [True for c in range(N_PATTERNS)]
 p_modes = [1  for c in range(N_PATTERNS)] # mode 0 is normalized, 1 is raw
 p_thresh = [True for c in range(N_PATTERNS)]
 past_pth = [True for c in range(N_PATTERNS)]
-
 
 actual_set = [0,0,0,0,0,0,""]
 actual_patterns = [0,0,0,0]
@@ -224,21 +228,25 @@ timetags = []
 ch_names = []
 protos = []
 
-
+# create plots for electrodes channels and pattern matchings
 filename_csv = ""
 PLOTS = [Plot(50+i*75, 300, 512, 70, CHANNELS[i], COLORS_ELEC[i]) for i in range(N_CHANNELS)]
 PATTERN_MATCHES = [Plot(550+i*75, 300, 512, 70, PATTERNS[i],COLORS_PATS[i]) for i in range(N_PATTERNS)]
 
 
-
-
-# -osc
+# ... .... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ...
 def init_osc(osc_host = OSC_HOST, osc_port = OSC_PORT):
+    """
+        Initialize OSC communications with HOST
+    """
     global OSC_CLIENT
     OSC_CLIENT = OSCClient(osc_host, osc_port)
     return
 
 def update_data(i=0):
+    """
+        Set new values in actual_set, reading it from canales 
+    """
     global canales, ch_names, actual_set
     print("\n\n[sample]: ", i)
     #reload new data
@@ -246,6 +254,11 @@ def update_data(i=0):
     return
 
 def get_dtw():
+    """
+        Estimates the distance between current data showed in channel plot 
+        and each of the training patterns. The distance should be interpreted as
+        inverse to similarity, so a lower distance means more similarity or matching.
+    """
     global protos, actual_patterns
     vector_a = np.array(([PLOTS[0].samples]), dtype=float)
     #print("--- V_B");print(vector_a);print(vector_a.shape)
@@ -261,13 +274,20 @@ def get_dtw():
     return
 
 def send_osc():
+    """
+        Manages the OSC message sending, by reading the states of switches, modes and threshold buttons-
+        Calculates normalized and thresholded values on demand.
+        Changes on OSC route requires updating the correpondant expression. that looks like this:
+            ruta = '/potencial/{}'.format(ch.lower()) 
+
+    """
     global ch_names, actual_set, OSC_CLIENT, past_pth
-    #update signal plots
+    # update ELECTRODES
     for j,ch in enumerate(ch_names):
         aux_val = float(actual_set[j])
         PLOTS[j].update(aux_val, ch)
         if (sws[j]):
-            ruta = '/potencial/{}'.format(ch.lower())
+            ruta = '/potencial/{}'.format(ch.lower())       #  <-   -   -OSC route for normalized/raw electrodes: normalized [0.0 -> 1.0], raw[-1000, 1000]
             ruta = ruta.encode()
             #print("{} \t{:0.3f}\t".format(ch, aux_val))
             if (modes[j]):
@@ -276,12 +296,12 @@ def send_osc():
                 nu_val = pmap(aux_val, -1000, 1000, 0 , 1)
                 OSC_CLIENT.send_message(ruta, [nu_val])
             #    print("{} \t{:0.3f}\t({:d})".format(s, aux_mean, len(lista_mediciones)))
-    # update pattern pĺots
+    # update PATTERNS
     for k, pm in enumerate(PATTERNS):
         aux_pat = float(actual_patterns[k])
         PATTERN_MATCHES[k].update(aux_pat, pm)
         if (p_sws[k]):
-            ruta = '/potencial/pattern/{}'.format(pm.lower())
+            ruta = '/potencial/pattern/{}'.format(pm.lower())#  <-   -   -OSC route for normalized/raw pattern: normalized [0.0 -> 1.0], raw [10000, 0]
             ruta = ruta.encode()
             #print("{} \t{:0.3f}\t".format(ch, aux_val))
             if (p_modes[k]):
@@ -290,7 +310,7 @@ def send_osc():
                 nu_val = pmap(aux_pat, 0, 10000, 1 , 0)
                 OSC_CLIENT.send_message(ruta, [nu_val])
                 if (p_thresh[k]):
-                    ruta = '/potencial/pattern/{}/thresh'.format(pm.lower())
+                    ruta = '/potencial/pattern/{}/thresh'.format(pm.lower()) #  <-   -OSC route for thresholded pattern: 1 when match 0 otherwise
                     ruta = ruta.encode()
                     if(nu_val>0.5):
                         pth = 1
@@ -300,7 +320,7 @@ def send_osc():
                         OSC_CLIENT.send_message(ruta, [pth])
                     if (past_pth[k]!=pth):
                         past_pth[k] = pth
-                        ruta = '/potencial/pattern/{}/on/'.format(pm.lower())
+                        ruta = '/potencial/pattern/{}/on/'.format(pm.lower())#  <-   -OSC route for recognized pattern: 1 when start matching, 0 when ends
                         ruta = ruta.encode()
                         OSC_CLIENT.send_message(ruta, [pth])
     return
@@ -308,8 +328,12 @@ def send_osc():
 
 
 def load_data_csv(filename_csv):
+    """
+        Loads columns of csv files as timeseries 
+            t	AF3	    F7	    F3	    F4	    F8	    AF7
+    
+    """
     global canales, timetags, ch_names
-    #carga las columnas del archivo    # t	AF3	F7	F3	F4	F8	AF7
     data = read_csv(filename_csv)
     canales["AF3"] = data["AF3"].tolist()
     canales["F7"] = data["F7"].tolist()
@@ -323,6 +347,11 @@ def load_data_csv(filename_csv):
     return
 
 def load_protos(filename_protos):
+    """
+        
+p_modes = [1  for c in range(N_PATTERNS)] Loads training instances, 
+        Add instances to allow more recognized patterns 
+    """
     global protos
     data2 = read_csv(filename_protos)
     protos.append(data2["PAT1"].tolist())
@@ -333,7 +362,7 @@ def load_protos(filename_protos):
 
 # functions
 def isFloat(s):
-    try:
+    try: 
         float(s)
         return True
     except ValueError:
@@ -346,7 +375,7 @@ def tic():
     update_data(ii)
     get_dtw()
     send_osc()
-    # update
+    # update 
     if (ii<len(canales[ch_names[0]])-1):
         ii = ii+1
     else:
@@ -360,7 +389,7 @@ def exit_():
     running=False
     return
 
-# handle keys
+# keys handler
 def handle_keys(event):
     global running
     if (event.key == pygame.K_ESCAPE):
@@ -381,7 +410,7 @@ def handle_events():
                 event_dict[event.type]()
     return
 
-# handlear clicks del mouse
+# click handler
 def handle_mouse_clicks():
     global sws, modes
     # check for mouse pos and click
@@ -419,25 +448,22 @@ def handle_mouse_clicks():
     return
 
 
-
-
+# ... .... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ...
 def update_graphics():
     #updaye plots and other gui
     PLOTS_SCREEN.fill(COLOR_BG)
-    #plot_one.draw(PLOTS_SCREEN, 100, 100)
-    #BTNS_SWS = [pygame.draw.rect(PLOTS_SCREEN, GREEN, pygame.Rect(100+c*75, 350, 50, 50), 2) for c in range(N_CONTAMS)]
     for c in range(N_CHANNELS):
         # do plots
         o_x = 100+c*75
         o_y = 50+c*75
         PLOTS[c].draw_h(PLOTS_SCREEN, 50, o_y)
-        # redo CH_SWITCHES
+        # update CH_SWITCHES
         if(sws[c]): pygame.draw.rect(PLOTS_SCREEN, COLORS_ELEC[c], pygame.Rect(250+320, o_y, 30, 70), 0)
         else: pygame.draw.rect(PLOTS_SCREEN, COLORS_ELEC[c], pygame.Rect(250+320, o_y, 30, 70), 1)
-        # redo CH_MODES
+        # upadte CH_MODES
         if(modes[c]): pygame.draw.rect(PLOTS_SCREEN, COLORS_ELEC[c], pygame.Rect(285+320, o_y, 30, 70), 0)
         else: pygame.draw.rect(PLOTS_SCREEN, COLORS_ELEC[c], pygame.Rect(285+320, o_y, 30, 70), 1)
-
+    # update pattern matching plots
     for c in range(N_PATTERNS):
         # do plots
         o_x = 100+c*75
@@ -452,47 +478,28 @@ def update_graphics():
         # redo PM_THRESH
         if(p_thresh[c]): pygame.draw.rect(PLOTS_SCREEN, COLORS_PATS[c], pygame.Rect(285+320, o_y, 30, 30), 0)
         else: pygame.draw.rect(PLOTS_SCREEN, COLORS_PATS[c], pygame.Rect(285+320, o_y, 30, 30), 2)
-
     # blit on WINDOW
     WINDOW.blit(PLOTS_SCREEN, (0, 0))
     pygame.display.flip()
     return
 
-# update labels and other text in display
 def update_text():
+    # update labels and other texts
     global LABELS, actual_set, actual_set_means
-    # blit on WINDOW
-    #WINDOW.blit(DRAW_SCREEN, (0, 0))
     AUX_LABEL = FONT.render('-> i n t e r s p e c i f i c s : ', 1, (32, 48, 0))
     WINDOW.blit(AUX_LABEL, (50, 25))
     AUX_LABEL = FONT.render(' [ POTENCIAL DE ACCIÓN ]', 1, (64, 32, 128))
     WINDOW.blit(AUX_LABEL, (360, 25))
-    """
-        for j in range(N_CHANNELS):
-        if sws[j]:     LAB = FONT.render(ch_names[j], 1, (0, 255, 0))
-        else:        LAB = FONT.render(ch_names[j], 1, (32, 24, 0))
-        #WINDOW.blit(LABELS[j], (104+j*75, 354))
-        if modes[j]:     STA = FONTmini.render("{:0.2f}".format(actual_set[j]), 1, (0, 255, 0))
-        else:        STA = FONTmini.render("{:0.2f}".format(actual_set[j]), 1, (0,127,0))
-        WINDOW.blit(LAB, (104+j*75, 514+160))
-        WINDOW.blit(STA, (104+j*75, 544+160))
-        # sign >
-        SIG_LABEL = FONTmini.render(">", 1, (192,255,0))
-        WINDOW.blit(SIG_LABEL, (92+j*75, 330-modes[j]*30+320))
-    """
-    CUNT_LABEL = FONT.render("[step]:  {}".format(ii), 1, (16,64,32))
-    WINDOW.blit(CUNT_LABEL, (50, 870))
-    #CUNT_LABEL = FONT.render("[timetag]:  "+actual_set_means[-1], 1, (16,64,32))
-    #WINDOW.blit(CUNT_LABEL, (100, 450))
-    #CUNT_LABEL = FONT.render("STAT:MMXX:", 1, (32,48,0))
-    #WINDOW.blit(CUNT_LABEL, (650, 600+160))
+    COUNT_LABEL = FONT.render("[step]:  {}".format(ii), 1, (16,64,32))
+    # blit on WINDOW
+    WINDOW.blit(COUNT_LABEL, (50, 870))
     pygame.display.flip()
     return
 
 
-
-# the loop from outside
+# ... .... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ...
 def game_loop():
+    # the app loop
     while running:
         handle_events()
         handle_mouse_clicks()
@@ -504,20 +511,17 @@ def game_loop():
 def main():
     pygame.display.set_caption(' . POTENCIAL DE ACCIÓN .')
     init_osc()
-    load_protos("./data/protos_256.csv")
-    load_data_csv("./data/EEGdata_02_ReducFilterIC/valery_RF_ELEC.csv")
+    load_protos("./data/protos_256.csv")                                    #  <-   -   -   -name of TRAINING file
+    load_data_csv("./data/EEGdata_02_ReducFilterIC/valery_RF_ELEC.csv")     #  <-   -   -   -name of DATA file, can be any _ELEC.csv file in folder
     pygame.time.set_timer(TIC_EVENT, TIC_TIMER)
     game_loop()
-    print("FIN DE LA TRANSMISSION //...")
+    print("END OF TRANSMISSION //...")
+    
 
 if __name__=="__main__":
     main()
 
 
 
-
-
-
-
-
 # -------------------------------------------------------------------------------
+
