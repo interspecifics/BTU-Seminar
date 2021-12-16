@@ -1,0 +1,29 @@
+[
+	{
+		"index": 0,
+		"type": "consolidacion",
+		"init_frame": 0,
+		"end_frame": 88,
+		"coordinates": [1120, 400],
+		"radius": 200,
+		"resolution": 60
+	},
+	{
+		"index": 1,
+		"type": "proyectil",
+		"init_frame": 44,
+		"end_frame": 88,
+		"coordinates": [816,866],
+		"radius": 350,
+		"resolution": 60
+	},
+	{
+		"index": 2,
+		"type": "fusion",
+		"init_frame": 89,
+		"end_frame": 230,
+		"coordinates": [1120, 400],
+		"radius": 230,
+		"resolution": 60
+}
+]

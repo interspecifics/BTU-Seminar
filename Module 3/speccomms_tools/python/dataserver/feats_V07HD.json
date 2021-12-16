@@ -1,0 +1,11 @@
+[
+	{
+		"index": 0,
+		"type": "saturno_intro",
+		"init_frame": 0,
+		"end_frame": 135,
+		"coordinates": [600, 440],
+		"radius": 230,
+		"resolution": 60
+	}
+]

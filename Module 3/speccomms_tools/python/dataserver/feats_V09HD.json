@@ -1,0 +1,29 @@
+[
+	{
+		"index": 0,
+		"type": "infty_a",
+		"init_frame": 0,
+		"end_frame": 120,
+		"coordinates": [935, 160],
+		"radius": 260,
+		"resolution": 60
+	},
+	{
+		"index": 1,
+		"type": "infty_b",
+		"init_frame": 0,
+		"end_frame": 120,
+		"coordinates": [1074, 542],
+		"radius": 145,
+		"resolution": 60
+	},
+	{
+		"index": 2,
+		"type": "swimmers",
+		"init_frame": 0,
+		"end_frame": 120,
+		"coordinates": [1735, 144],
+		"radius": 170,
+		"resolution": 60
+}
+]

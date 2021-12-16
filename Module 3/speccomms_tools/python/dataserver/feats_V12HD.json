@@ -1,0 +1,20 @@
+[
+	{
+		"index": 0,
+		"type": "big_saturno_a",
+		"init_frame": 0,
+		"end_frame": 120,
+		"coordinates": [1700, 447],
+		"radius": 340,
+		"resolution": 60
+	},
+	{
+		"index": 1,
+		"type": "big_saturno_b",
+		"init_frame": 0,
+		"end_frame": 120,
+		"coordinates": [1700, 447],
+		"radius": 614,
+		"resolution": 60
+	}
+]

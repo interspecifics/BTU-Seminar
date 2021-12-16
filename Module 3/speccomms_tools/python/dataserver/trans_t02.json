@@ -1,0 +1,33 @@
+{
+	"name": "test_new",
+	"description": "24htimelapses",
+	"ip_address_a": "10.200.2.9",
+	"osc_port_a": 8000,
+	"ip_address_b": "192.168.1.87",
+	"osc_port_b": 8000,
+	"resolution": 30,
+	"sleeptime": 0.02,
+	"sequence": [
+					{
+						"index": 1,
+						"duration": 180,
+						"name": "R2DN6_HC_pt01",
+						"data_filename": "R2DN6_HC_1.json",
+						"feats_filename": "feats_R2DN6_HC_1.json"
+					},
+					{
+						"index": 1,
+						"duration": 180,
+						"name": "R2DN6_HC_pt02",
+						"data_filename": "R2DN6_HC_2.json",
+						"feats_filename": "feats_R2DN6_HC_2.json"
+					},
+					{
+						"index": 1,
+						"duration": 180,
+						"name": "R2DN6_HC_pt03",
+						"data_filename": "R2DN6_HC_3.json",
+						"feats_filename": "feats_R2DN6_HC_3.json"
+					}
+				]
+}

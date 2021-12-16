@@ -1,0 +1,29 @@
+[
+	{
+		"index": 0,
+		"type": "saturno",
+		"init_frame": 5,
+		"end_frame": 45,
+		"coordinates": [312, 202],
+		"radius": 270,
+		"resolution": 60
+	},
+	{
+		"index": 1,
+		"type": "difusor",
+		"init_frame": 40,
+		"end_frame": 50,
+		"coordinates": [1730, 1010],
+		"radius": 244,
+		"resolution": 60
+	},
+	{
+		"index": 2,
+		"type": "atractor",
+		"init_frame": 5,
+		"end_frame": 17,
+		"coordinates": [622, 505],
+		"radius": 460,
+		"resolution": 60
+}
+]

@@ -1,0 +1,29 @@
+[
+	{
+		"index": 0,
+		"type": "saturno_a",
+		"init_frame": 0,
+		"end_frame": 120,
+		"coordinates": [400, 1000],
+		"radius": 150,
+		"resolution": 60
+	},
+	{
+		"index": 1,
+		"type": "saturno_b",
+		"init_frame": 0,
+		"end_frame": 120,
+		"coordinates": [600, 222],
+		"radius": 150,
+		"resolution": 60
+	},
+	{
+		"index": 2,
+		"type": "saturno_c",
+		"init_frame": 0,
+		"end_frame": 120,
+		"coordinates": [200, 600],
+		"radius": 99,
+		"resolution": 60
+	}
+]
